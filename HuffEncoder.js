@@ -2,16 +2,21 @@
 const HuffTree = require('./HuffTree');
 const Dictionary = require('./Dictionary');
 let fs = require('fs');
+let path = require('path');
 const StringHash = require('./StringHash');
 
 class HuffEncoder{
     #charWeights = null;
     #charSet = null;
+    #inputFileName = null;
+    #inputString = null;
 
     constructor(inputFileName){
         let encodingText = fs.readFileSync(inputFileName, 'utf8');
+        this.#inputFileName = path.basename(inputFileName);
         this.#charWeights = new Dictionary(encodingText.length);
         this.#charSet = new Set();
+        this.#inputString = encodingText;
 
         for(let char of encodingText){ //iterate the input string and count each char
             this.#charSet.add(char);
@@ -64,9 +69,15 @@ class HuffEncoder{
 
         let completeTree = weightOrderedHuffTrees[0];
 
-        let paths = completeTree.getPathToLeaves();
+        let paths = {};
+        completeTree.getPathToLeaves(paths);
 
-        //TODO: build and output the compressed text by paths
+        let encodedBinary = '';
+        for(let char of this.#inputString){
+            encodedBinary += paths[char] + ' ';
+        }
+
+        fs.writeFileSync(this.#inputFileName+'.huff', encodedBinary.trim() + '\n');
     }
 
 }

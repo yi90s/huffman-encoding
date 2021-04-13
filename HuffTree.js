@@ -87,13 +87,17 @@ class HuffTree{
         yield *this.inorderTraversal(root.right);
     }    
 
-    getPathToLeaves(root = this.#root, paths = ''){
+    getPathToLeaves(dict, path='', root = this.#root){
         if(!root){
-            return;
+            return; 
         }
 
-        this.getPathToLeaves(root.left, paths);
-        //TODO
+        this.getPathToLeaves(dict, path + '0', root.left);
+        if(root.data){
+            dict[root.data] = path;
+        }
+        this.getPathToLeaves(dict, path + '1', root.right);
+        
     }
 
 }
